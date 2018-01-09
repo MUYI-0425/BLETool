@@ -6,7 +6,7 @@
 //  Copyright © 2016年 孙晓东. All rights reserved.
 //
 
-#import "BlueToothHelp.h"
+#import "BLETool.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
 typedef void(^sendState)(SENDDATASTATE sendState);
