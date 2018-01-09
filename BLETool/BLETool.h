@@ -19,11 +19,11 @@ typedef NS_ENUM(NSInteger,SENDDATASTATE){
     ReConnectCountEnd
 };
 typedef void(^ReadData)(NSData *readData);
-@interface BlueToothHelp : NSObject
+@interface BLETool: NSObject
 //蓝牙是否打开
 @property (nonatomic,assign)BTSTATE blueToothState;
 //创建单例对象
-+ (BlueToothHelp *)shareInstance;
++ (BLETool *)shareInstance;
 //发送数据
 - (void)BlueToothBeginSendDataWithBTName:(NSString *)BTName
                                  maxTime:(int)maxTime    //扫描时间

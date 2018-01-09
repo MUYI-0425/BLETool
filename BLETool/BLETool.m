@@ -11,7 +11,7 @@
 
 typedef void(^sendState)(SENDDATASTATE sendState);
 
-@interface BlueToothHelp()<CBCentralManagerDelegate,CBPeripheralDelegate>
+@interface BLETool()<CBCentralManagerDelegate,CBPeripheralDelegate>
 @property (nonatomic,copy)sendState sendState;
 @property (nonatomic,copy)NSString *blueName;
 @property (nonatomic,copy)ReadData readCharacterValue;
@@ -30,9 +30,9 @@ typedef void(^sendState)(SENDDATASTATE sendState);
 @property (nonatomic,strong)NSData *sendData;
 @end
 
-@implementation BlueToothHelp
-+ (BlueToothHelp *)shareInstance {
-    static BlueToothHelp *help = nil;
+@implementation BLETool
++ (BLETool *)shareInstance {
+    static BLETool *help = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         help = [[self alloc] init];
@@ -157,6 +157,28 @@ typedef void(^sendState)(SENDDATASTATE sendState);
             [self.centralManager connectPeripheral:peripheral options:nil];
         });
     }
+}
+- (void)timeCountDown {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    dispatch_time_t start = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+    uint64_t interval = (uint64_t)(1.0 * NSEC_PER_SEC);
+    dispatch_source_set_timer(self.timer, start, interval, 0);
+    dispatch_source_set_event_handler(self.timer, ^{
+        if (_timeout <= 0) {
+            if (_timer) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (self.sendState) {
+                        self.sendState(SendDataTimeOut);
+                        dispatch_source_cancel(self.timer);
+                    }
+                });
+            }
+        }else {
+            _timeout--;
+        }
+    });
+    dispatch_resume(self.timer);
 }
 //字符串转化为16进制
 - (NSData *)convertHexStrToData:(NSString *)str {
